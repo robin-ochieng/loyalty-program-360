@@ -14,8 +14,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Kenbright360 Loyalty/KYC',
-  description: 'Kenbright360 platform (Loyalty & KYC)',
+  title: 'Kenbright360',
+  description: 'Kenbright360 Loyalty & KYC Platform',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
 };
 
 export default function RootLayout({

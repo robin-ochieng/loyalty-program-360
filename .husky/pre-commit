@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "Running pre-commit checks..."
+if command -v pnpm >/dev/null 2>&1; then
+	PM=pnpm
+else
+	PM=npm
+fi
+
+$PM run typecheck && $PM run lint && npx lint-staged

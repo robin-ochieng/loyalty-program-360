@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kenbright360 Loyalty/KYC
 
-## Getting Started
+Production-ready Next.js 14 (App Router) + TypeScript + Tailwind + shadcn/ui starter, wired for Supabase with SSR-safe clients, solid DX tooling, and a ready layout for KYC flows.
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Next.js 14 App Router, TypeScript (strict), Tailwind v4
+- shadcn/ui (generated core components)
+- Supabase (`@supabase/supabase-js` + `@supabase/ssr`)
+- ESLint + Prettier + Husky + lint-staged
+
+## Quick start
+
+1. Copy `.env.example` to `.env.local` and fill in values:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - later: `UPLOADTHING_TOKEN`
+
+2. Install dependencies and run:
+   - pnpm i
+   - pnpm dev
+
+3. Visit:
+   - `http://localhost:3000/api/health` → should return `{ status: "ok" }`
+   - `http://localhost:3000/login`
+   - `http://localhost:3000/kyc` (requires auth; placeholder gate)
+
+## Scripts
+
+- `dev`, `build`, `start`
+- `lint` (Next lint), `format` (Prettier), `typecheck`
+- `prepare` (husky)
+
+## Conventions
+
+- Import alias `@/` → `src/`
+- Components under `src/components/*`, lib under `src/lib/*`
+
+## Supabase
+
+- Browser client: `src/lib/supabase/client.ts`
+- Server client (SSR-safe): `src/lib/supabase/server.ts`
+- Types: `src/lib/utils/types.ts` (placeholder)
+
+To generate DB types later:
+
+```
+supabase gen types typescript --project-id <id> > src/lib/database.types.ts
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Storage & RLS
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- Create a private Storage bucket `kyc` (policy TODO)
+- Add Row Level Security (RLS) policies for tables (TODO)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## UploadThing
 
-## Learn More
+- Packages are installed but not wired. Add `UPLOADTHING_TOKEN` to `.env.local` when integrating.
 
-To learn more about Next.js, take a look at the following resources:
+## CI
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- GitHub Actions workflow runs typecheck, lint, and build on PRs and pushes to main.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Next steps
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Implement Supabase auth (magic link) on `/login`
+- Introduce protected routes and session handling
+- Flesh out KYC forms (zod schemas, react-hook-form) and file uploads
+- Add DB migrations and generate types
+- Add E2E tests

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Upload, CheckCircle2, AlertCircle, FileText, X, Check } from 'lucide-react';
 import KycSidebar from '@/components/kyc/KycSidebar';
 import supabase from '@/lib/supabase/client';
+import { USE_SUPABASE } from '@/lib/flags';
 
 interface Product {
   id: string;
@@ -105,6 +106,12 @@ export default function KycClient() {
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Mock upload when Supabase is disabled
+  async function mockUpload(file: File) {
+    await new Promise((r) => setTimeout(r, 300));
+    return { path: `mock/${Date.now()}-${file.name}` } as const;
+  }
 
   // Update required docs + plate number visibility based on selection
   useEffect(() => {
@@ -220,17 +227,40 @@ export default function KycClient() {
   };
 
   const uploadDocumentToSupabase = async (file: File, clientId: string, docType: string) => {
+    if (!USE_SUPABASE) {
+      const res = await mockUpload(file);
+      return res.path;
+    }
     const fileExt = file.name.split('.').pop();
     const fileName = `${clientId}/${docType}_${Date.now()}.${fileExt}`;
-    const { data, error } = await supabase.storage.from('kyc-documents').upload(fileName, file);
+    const { data, error } = await (supabase as any).storage
+      .from('kyc-documents')
+      .upload(fileName, file);
     if (error) throw error;
-    return data.path;
+    return (data as any).path as string;
   };
 
   const handleSubmit = async () => {
     if (!validateStep3()) return;
     setLoading(true);
     try {
+      if (!USE_SUPABASE) {
+        // Mocked persistence: perform no network calls
+        // Simulate uploads to get mock paths
+        for (const [key, doc] of Object.entries(documents) as [DocumentKey, DocumentItem][]) {
+          if (doc.file) {
+            const p = await mockUpload(doc.file);
+            setDocuments((prev) => ({
+              ...prev,
+              [key]: { ...prev[key], url: p.path, isUploaded: true },
+            }));
+          }
+        }
+        alert('Saved locally (mock).');
+        router.push('/');
+        return;
+      }
+
       const { data: clientRecord, error: clientError } = await (supabase as any)
         .from('clients')
         .insert([

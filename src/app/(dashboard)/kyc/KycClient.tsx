@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Upload, CheckCircle2, AlertCircle, FileText, X, Check } from 'lucide-react';
+import KycSidebar from '@/components/kyc/KycSidebar';
 import supabase from '@/lib/supabase/client';
 
 interface Product {
@@ -282,480 +283,429 @@ export default function KycClient() {
   // --- Layout without internal sidebar; selection moved to Step 2 ---
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="p-4 md:p-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Stepper */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div
-                className={`flex items-center ${step >= 1 ? 'text-indigo-600' : 'text-gray-400'}`}
-              >
+      <div className="flex">
+        <KycSidebar selected={selectedProducts} onToggle={handleProductToggle} />
+        <div className="flex-1 p-4 md:p-8">
+          <div className="max-w-4xl mx-auto">
+            {/* Stepper */}
+            <div className="mb-8">
+              <div className="flex items-center justify-between">
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200'
-                  }`}
+                  className={`flex items-center ${step >= 1 ? 'text-indigo-600' : 'text-gray-400'}`}
                 >
-                  1
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200'
+                    }`}
+                  >
+                    1
+                  </div>
+                  <span className="ml-3 font-medium">Personal Information</span>
                 </div>
-                <span className="ml-3 font-medium">Personal Information</span>
-              </div>
-              <div className={`flex-1 h-1 mx-4 ${step > 1 ? 'bg-indigo-600' : 'bg-gray-200'}`} />
+                <div className={`flex-1 h-1 mx-4 ${step > 1 ? 'bg-indigo-600' : 'bg-gray-200'}`} />
 
-              <div
-                className={`flex items-center ${step >= 2 ? 'text-indigo-600' : 'text-gray-400'}`}
-              >
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    step >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200'
-                  }`}
+                  className={`flex items-center ${step >= 2 ? 'text-indigo-600' : 'text-gray-400'}`}
                 >
-                  2
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      step >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-200'
+                    }`}
+                  >
+                    2
+                  </div>
+                  <span className="ml-3 font-medium">Product Selection</span>
                 </div>
-                <span className="ml-3 font-medium">Product Selection</span>
-              </div>
-              <div className={`flex-1 h-1 mx-4 ${step > 2 ? 'bg-indigo-600' : 'bg-gray-200'}`} />
+                <div className={`flex-1 h-1 mx-4 ${step > 2 ? 'bg-indigo-600' : 'bg-gray-200'}`} />
 
-              <div
-                className={`flex items-center ${step >= 3 ? 'text-indigo-600' : 'text-gray-400'}`}
-              >
                 <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    step >= 3 ? 'bg-indigo-600 text-white' : 'bg-gray-200'
-                  }`}
+                  className={`flex items-center ${step >= 3 ? 'text-indigo-600' : 'text-gray-400'}`}
                 >
-                  3
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      step >= 3 ? 'bg-indigo-600 text-white' : 'bg-gray-200'
+                    }`}
+                  >
+                    3
+                  </div>
+                  <span className="ml-3 font-medium">Document Upload</span>
                 </div>
-                <span className="ml-3 font-medium">Document Upload</span>
               </div>
             </div>
-          </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-8">
-            {step === 1 && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Personal Information</h2>
+            <div className="bg-white rounded-xl shadow-lg p-8">
+              {step === 1 && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Personal Information</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Client Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={clientData.client_name}
-                      onChange={(e) =>
-                        setClientData({ ...clientData, client_name: e.target.value })
-                      }
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
-                        errors.client_name ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter full name"
-                    />
-                    {errors.client_name && (
-                      <p className="text-sm text-red-500 mt-1">{errors.client_name}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      National ID Number *
-                    </label>
-                    <input
-                      type="text"
-                      value={clientData.national_id}
-                      onChange={(e) =>
-                        setClientData({ ...clientData, national_id: e.target.value })
-                      }
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
-                        errors.national_id ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter National ID"
-                    />
-                    {errors.national_id && (
-                      <p className="text-sm text-red-500 mt-1">{errors.national_id}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      KRA PIN Number *
-                    </label>
-                    <input
-                      type="text"
-                      value={clientData.kra_pin}
-                      onChange={(e) => setClientData({ ...clientData, kra_pin: e.target.value })}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
-                        errors.kra_pin ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="Enter KRA PIN"
-                    />
-                    {errors.kra_pin && (
-                      <p className="text-sm text-red-500 mt-1">{errors.kra_pin}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Mobile Phone Number *
-                    </label>
-                    <input
-                      type="tel"
-                      value={clientData.mobile_phone}
-                      onChange={(e) =>
-                        setClientData({ ...clientData, mobile_phone: e.target.value })
-                      }
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
-                        errors.mobile_phone ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="+254 or 07XX XXX XXX"
-                    />
-                    {errors.mobile_phone && (
-                      <p className="text-sm text-red-500 mt-1">{errors.mobile_phone}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Email Address *
-                    </label>
-                    <input
-                      type="email"
-                      value={clientData.email}
-                      onChange={(e) => setClientData({ ...clientData, email: e.target.value })}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
-                        errors.email ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                      placeholder="email@example.com"
-                    />
-                    {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
-                    <select
-                      value={clientData.gender}
-                      onChange={(e) => setClientData({ ...clientData, gender: e.target.value })}
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
-                        errors.gender ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                      <option value="Other">Other</option>
-                    </select>
-                    {errors.gender && <p className="text-sm text-red-500 mt-1">{errors.gender}</p>}
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Date of Birth *
-                    </label>
-                    <input
-                      type="date"
-                      value={clientData.date_of_birth}
-                      onChange={(e) =>
-                        setClientData({ ...clientData, date_of_birth: e.target.value })
-                      }
-                      className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
-                        errors.date_of_birth ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                    />
-                    {errors.date_of_birth && (
-                      <p className="text-sm text-red-500 mt-1">{errors.date_of_birth}</p>
-                    )}
-                  </div>
-
-                  {showPlateNumber && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Vehicle Plate Number *
-                        <span className="text-xs text-gray-500 ml-2">
-                          (Required for Motor Insurance)
-                        </span>
+                        Client Name *
                       </label>
                       <input
                         type="text"
-                        value={clientData.plate_number}
+                        value={clientData.client_name}
                         onChange={(e) =>
-                          setClientData({ ...clientData, plate_number: e.target.value })
+                          setClientData({ ...clientData, client_name: e.target.value })
                         }
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
-                          errors.plate_number ? 'border-red-500' : 'border-gray-300'
+                          errors.client_name ? 'border-red-500' : 'border-gray-300'
                         }`}
-                        placeholder="KXX 123X"
+                        placeholder="Enter full name"
                       />
-                      {errors.plate_number && (
-                        <p className="text-sm text-red-500 mt-1">{errors.plate_number}</p>
+                      {errors.client_name && (
+                        <p className="text-sm text-red-500 mt-1">{errors.client_name}</p>
                       )}
                     </div>
-                  )}
-                </div>
-              </div>
-            )}
 
-            {step === 2 && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Select Your Products</h2>
-                {/* Product selection grids (moved from sidebar) */}
-                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Core Products</h3>
-                    <div className="space-y-2">
-                      {products
-                        .filter((p) => p.category === 'Core')
-                        .map((product) => (
-                          <label
-                            key={product.id}
-                            className={`flex items-center p-3 rounded-lg cursor-pointer transition-all border-2 ${
-                              selectedProducts.includes(product.id)
-                                ? 'bg-indigo-50 border-indigo-500 text-indigo-700'
-                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                            }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedProducts.includes(product.id)}
-                              onChange={() => handleProductToggle(product.id)}
-                              className="sr-only"
-                            />
-                            <div className="flex items-center justify-between w-full">
-                              <span className="text-sm font-medium">{product.product_name}</span>
-                              {selectedProducts.includes(product.id) && (
-                                <CheckCircle2 className="w-5 h-5 text-indigo-600" />
-                              )}
-                            </div>
-                          </label>
-                        ))}
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-800 mb-3">Optional Products</h3>
-                    <div className="space-y-2">
-                      {products
-                        .filter((p) => p.category === 'Optional')
-                        .map((product) => (
-                          <label
-                            key={product.id}
-                            className={`flex items-center p-3 rounded-lg cursor-pointer transition-all border-2 ${
-                              selectedProducts.includes(product.id)
-                                ? 'bg-purple-50 border-purple-500 text-purple-700'
-                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                            }`}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedProducts.includes(product.id)}
-                              onChange={() => handleProductToggle(product.id)}
-                              className="sr-only"
-                            />
-                            <div className="flex items-center justify-between w-full">
-                              <span className="text-sm font-medium">{product.product_name}</span>
-                              {selectedProducts.includes(product.id) && (
-                                <CheckCircle2 className="w-5 h-5 text-purple-600" />
-                              )}
-                            </div>
-                          </label>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Validation message */}
-                {errors.products && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
-                    <p className="text-sm text-red-600">{errors.products}</p>
-                  </div>
-                )}
-
-                {/* Confirmation block */}
-                <h3 className="text-xl font-semibold text-gray-800 mb-4">Confirm Selection</h3>
-                <div className="bg-gray-50 rounded-lg p-6">
-                  <p className="text-sm text-gray-600 mb-4">
-                    You have selected {selectedProducts.length} product(s). Please confirm your
-                    selection:
-                  </p>
-                  {selectedProducts.length > 0 ? (
-                    <div className="space-y-3">
-                      {selectedProducts.map((productId) => {
-                        const product = products.find((p) => p.id === productId);
-                        return product ? (
-                          <div
-                            key={productId}
-                            className="flex items-center justify-between bg-white p-4 rounded-lg"
-                          >
-                            <div className="flex items-center">
-                              <CheckCircle2 className="w-5 h-5 text-green-500 mr-3" />
-                              <span className="font-medium">{product.product_name}</span>
-                              <span
-                                className={`ml-3 px-2 py-1 text-xs rounded-full ${
-                                  product.category === 'Core'
-                                    ? 'bg-indigo-100 text-indigo-800'
-                                    : 'bg-purple-100 text-purple-800'
-                                }`}
-                              >
-                                {product.category}
-                              </span>
-                            </div>
-                            <button
-                              onClick={() => handleProductToggle(productId)}
-                              className="text-red-500 hover:text-red-700"
-                              aria-label="Remove product"
-                            >
-                              <X className="w-5 h-5" />
-                            </button>
-                          </div>
-                        ) : null;
-                      })}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
-                      <p className="text-gray-600">No products selected</p>
-                      <p className="text-sm text-gray-500 mt-2">
-                        Please select at least one product above
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="mt-6 p-4 bg-indigo-50 rounded-lg">
-                    <h4 className="font-semibold text-indigo-800 mb-2">Your Tier Status:</h4>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-indigo-600">
-                        {selectedProducts.length >= 5
-                          ? 'Platinum'
-                          : selectedProducts.length >= 3
-                            ? 'Gold'
-                            : selectedProducts.length === 2
-                              ? 'Silver'
-                              : 'Bronze'}
-                      </span>
-                      <span className="text-sm text-indigo-600">
-                        {selectedProducts.length >= 5
-                          ? 'Maximum benefits unlocked!'
-                          : `${5 - selectedProducts.length} more product(s) to reach Platinum`}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {step === 3 && (
-              <div>
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Upload Required Documents</h2>
-                <div className="space-y-6">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 className="font-semibold text-blue-800 mb-2">Required Documents:</h3>
-                    <ul className="text-sm text-blue-700 space-y-1">
-                      <li>• National ID (Required for all products)</li>
-                      <li>• KRA PIN Certificate (Required for all products)</li>
-                      {documents.logbook.isRequired && (
-                        <li>• Vehicle Logbook (Required for Motor Insurance)</li>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        National ID Number *
+                      </label>
+                      <input
+                        type="text"
+                        value={clientData.national_id}
+                        onChange={(e) =>
+                          setClientData({ ...clientData, national_id: e.target.value })
+                        }
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
+                          errors.national_id ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter National ID"
+                      />
+                      {errors.national_id && (
+                        <p className="text-sm text-red-500 mt-1">{errors.national_id}</p>
                       )}
-                      {documents.passport.isRequired && (
-                        <li>• Passport (Required for Travel Insurance)</li>
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        KRA PIN Number *
+                      </label>
+                      <input
+                        type="text"
+                        value={clientData.kra_pin}
+                        onChange={(e) => setClientData({ ...clientData, kra_pin: e.target.value })}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
+                          errors.kra_pin ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter KRA PIN"
+                      />
+                      {errors.kra_pin && (
+                        <p className="text-sm text-red-500 mt-1">{errors.kra_pin}</p>
                       )}
-                    </ul>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {(Object.entries(documents) as [DocumentKey, DocumentItem][]).map(
-                      ([key, doc]) => {
-                        if (!doc.isRequired && key !== 'national_id' && key !== 'kra_certificate')
-                          return null;
-                        return (
-                          <div
-                            key={key}
-                            className="border-2 border-dashed border-gray-300 rounded-lg p-6"
-                          >
-                            <div className="text-center">
-                              <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-                              <h4 className="font-medium text-gray-700 mb-2">
-                                {doc.type.replace(/_/g, ' ')}
-                                {doc.isRequired && <span className="text-red-500 ml-1">*</span>}
-                              </h4>
-                              {doc.file ? (
-                                <div className="bg-green-50 rounded-lg p-3">
-                                  <CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" />
-                                  <p className="text-sm text-green-700">{doc.file.name}</p>
-                                  <button
-                                    onClick={() => handleFileUpload(key as DocumentKey, null)}
-                                    className="text-xs text-red-500 hover:text-red-700 mt-2"
-                                  >
-                                    Remove
-                                  </button>
-                                </div>
-                              ) : (
-                                <>
-                                  <label className="cursor-pointer">
-                                    <span className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-                                      <Upload className="w-4 h-4 mr-2" />
-                                      Choose File
-                                    </span>
-                                    <input
-                                      type="file"
-                                      className="sr-only"
-                                      accept=".pdf,.jpg,.jpeg,.png"
-                                      onChange={(e) => {
-                                        if (e.target.files?.[0])
-                                          handleFileUpload(key as DocumentKey, e.target.files[0]);
-                                      }}
-                                    />
-                                  </label>
-                                  <p className="text-xs text-gray-500 mt-2">
-                                    PDF, JPG, or PNG (Max 5MB)
-                                  </p>
-                                </>
-                              )}
-                              {errors[key] && (
-                                <p className="text-sm text-red-500 mt-2">{errors[key]}</p>
-                              )}
-                            </div>
-                          </div>
-                        );
-                      },
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Mobile Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={clientData.mobile_phone}
+                        onChange={(e) =>
+                          setClientData({ ...clientData, mobile_phone: e.target.value })
+                        }
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
+                          errors.mobile_phone ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="+254 or 07XX XXX XXX"
+                      />
+                      {errors.mobile_phone && (
+                        <p className="text-sm text-red-500 mt-1">{errors.mobile_phone}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        value={clientData.email}
+                        onChange={(e) => setClientData({ ...clientData, email: e.target.value })}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
+                          errors.email ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="email@example.com"
+                      />
+                      {errors.email && <p className="text-sm text-red-500 mt-1">{errors.email}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Gender *
+                      </label>
+                      <select
+                        value={clientData.gender}
+                        onChange={(e) => setClientData({ ...clientData, gender: e.target.value })}
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
+                          errors.gender ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      >
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      {errors.gender && (
+                        <p className="text-sm text-red-500 mt-1">{errors.gender}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Date of Birth *
+                      </label>
+                      <input
+                        type="date"
+                        value={clientData.date_of_birth}
+                        onChange={(e) =>
+                          setClientData({ ...clientData, date_of_birth: e.target.value })
+                        }
+                        className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
+                          errors.date_of_birth ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                      />
+                      {errors.date_of_birth && (
+                        <p className="text-sm text-red-500 mt-1">{errors.date_of_birth}</p>
+                      )}
+                    </div>
+
+                    {showPlateNumber && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Vehicle Plate Number *
+                          <span className="text-xs text-gray-500 ml-2">
+                            (Required for Motor Insurance)
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          value={clientData.plate_number}
+                          onChange={(e) =>
+                            setClientData({ ...clientData, plate_number: e.target.value })
+                          }
+                          className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 ${
+                            errors.plate_number ? 'border-red-500' : 'border-gray-300'
+                          }`}
+                          placeholder="KXX 123X"
+                        />
+                        {errors.plate_number && (
+                          <p className="text-sm text-red-500 mt-1">{errors.plate_number}</p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Footer actions */}
-            <div className="flex justify-between mt-8">
-              {step > 1 && (
-                <button
-                  onClick={handlePreviousStep}
-                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  Previous
-                </button>
-              )}
-              {step < 3 ? (
-                <button
-                  onClick={handleNextStep}
-                  className="ml-auto px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-                >
-                  Next Step
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit}
-                  disabled={loading}
-                  className="ml-auto px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
-                >
-                  {loading ? (
-                    <>
-                      <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="w-5 h-5 mr-2" />
-                      Submit KYC
-                    </>
+              {step === 2 && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-2">Select Your Products</h2>
+                  <p className="text-sm text-gray-600 mb-6">
+                    Use the sidebar to choose your Core and Optional products. Your tier updates
+                    automatically.
+                  </p>
+                  {/* Validation message */}
+                  {errors.products && (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
+                      <p className="text-sm text-red-600">{errors.products}</p>
+                    </div>
                   )}
-                </button>
+
+                  {/* Confirmation block */}
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4">Confirm Selection</h3>
+                  <div className="bg-gray-50 rounded-lg p-6">
+                    <p className="text-sm text-gray-600 mb-4">
+                      You have selected {selectedProducts.length} product(s). Please confirm your
+                      selection:
+                    </p>
+                    {selectedProducts.length > 0 ? (
+                      <div className="space-y-3">
+                        {selectedProducts.map((productId) => {
+                          const product = products.find((p) => p.id === productId);
+                          return product ? (
+                            <div
+                              key={productId}
+                              className="flex items-center justify-between bg-white p-4 rounded-lg"
+                            >
+                              <div className="flex items-center">
+                                <CheckCircle2 className="w-5 h-5 text-green-500 mr-3" />
+                                <span className="font-medium">{product.product_name}</span>
+                                <span
+                                  className={`ml-3 px-2 py-1 text-xs rounded-full ${
+                                    product.category === 'Core'
+                                      ? 'bg-indigo-100 text-indigo-800'
+                                      : 'bg-purple-100 text-purple-800'
+                                  }`}
+                                >
+                                  {product.category}
+                                </span>
+                              </div>
+                              <button
+                                onClick={() => handleProductToggle(productId)}
+                                className="text-red-500 hover:text-red-700"
+                                aria-label="Remove product"
+                              >
+                                <X className="w-5 h-5" />
+                              </button>
+                            </div>
+                          ) : null;
+                        })}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-3" />
+                        <p className="text-gray-600">No products selected</p>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Please select at least one product above
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="mt-6 p-4 bg-indigo-50 rounded-lg">
+                      <h4 className="font-semibold text-indigo-800 mb-2">Your Tier Status:</h4>
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl font-bold text-indigo-600">
+                          {selectedProducts.length >= 5
+                            ? 'Platinum'
+                            : selectedProducts.length >= 3
+                              ? 'Gold'
+                              : selectedProducts.length === 2
+                                ? 'Silver'
+                                : 'Bronze'}
+                        </span>
+                        <span className="text-sm text-indigo-600">
+                          {selectedProducts.length >= 5
+                            ? 'Maximum benefits unlocked!'
+                            : `${5 - selectedProducts.length} more product(s) to reach Platinum`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               )}
+
+              {step === 3 && (
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-800 mb-6">
+                    Upload Required Documents
+                  </h2>
+                  <div className="space-y-6">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <h3 className="font-semibold text-blue-800 mb-2">Required Documents:</h3>
+                      <ul className="text-sm text-blue-700 space-y-1">
+                        <li>• National ID (Required for all products)</li>
+                        <li>• KRA PIN Certificate (Required for all products)</li>
+                        {documents.logbook.isRequired && (
+                          <li>• Vehicle Logbook (Required for Motor Insurance)</li>
+                        )}
+                        {documents.passport.isRequired && (
+                          <li>• Passport (Required for Travel Insurance)</li>
+                        )}
+                      </ul>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {(Object.entries(documents) as [DocumentKey, DocumentItem][]).map(
+                        ([key, doc]) => {
+                          if (!doc.isRequired && key !== 'national_id' && key !== 'kra_certificate')
+                            return null;
+                          return (
+                            <div
+                              key={key}
+                              className="border-2 border-dashed border-gray-300 rounded-lg p-6"
+                            >
+                              <div className="text-center">
+                                <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                                <h4 className="font-medium text-gray-700 mb-2">
+                                  {doc.type.replace(/_/g, ' ')}
+                                  {doc.isRequired && <span className="text-red-500 ml-1">*</span>}
+                                </h4>
+                                {doc.file ? (
+                                  <div className="bg-green-50 rounded-lg p-3">
+                                    <CheckCircle2 className="w-5 h-5 text-green-500 mx-auto mb-2" />
+                                    <p className="text-sm text-green-700">{doc.file.name}</p>
+                                    <button
+                                      onClick={() => handleFileUpload(key as DocumentKey, null)}
+                                      className="text-xs text-red-500 hover:text-red-700 mt-2"
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <label className="cursor-pointer">
+                                      <span className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+                                        <Upload className="w-4 h-4 mr-2" />
+                                        Choose File
+                                      </span>
+                                      <input
+                                        type="file"
+                                        className="sr-only"
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                        onChange={(e) => {
+                                          if (e.target.files?.[0])
+                                            handleFileUpload(key as DocumentKey, e.target.files[0]);
+                                        }}
+                                      />
+                                    </label>
+                                    <p className="text-xs text-gray-500 mt-2">
+                                      PDF, JPG, or PNG (Max 5MB)
+                                    </p>
+                                  </>
+                                )}
+                                {errors[key] && (
+                                  <p className="text-sm text-red-500 mt-2">{errors[key]}</p>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        },
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Footer actions */}
+              <div className="flex justify-between mt-8">
+                {step > 1 && (
+                  <button
+                    onClick={handlePreviousStep}
+                    className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Previous
+                  </button>
+                )}
+                {step < 3 ? (
+                  <button
+                    onClick={handleNextStep}
+                    className="ml-auto px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Next Step
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="ml-auto px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center"
+                  >
+                    {loading ? (
+                      <>
+                        <span className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></span>
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-5 h-5 mr-2" />
+                        Submit KYC
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

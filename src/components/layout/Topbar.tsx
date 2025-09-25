@@ -14,14 +14,16 @@ export default function Topbar() {
             <Menu className="size-5" />
           </Button>
           <div className="shrink-0">
-            <Image
-              src="/Kenbright 360 Logo.png"
-              alt="Kenbright360 Logo"
-              width={140}
-              height={40}
-              priority
-              className="h-8 w-auto sm:h-9"
-            />
+            <Link href="/" aria-label="Go to Home">
+              <Image
+                src="/Kenbright 360 Logo.png"
+                alt="Kenbright360 Logo"
+                width={140}
+                height={40}
+                priority
+                className="h-8 w-auto sm:h-9"
+              />
+            </Link>
           </div>
         </div>
         <nav className="flex items-center gap-3">

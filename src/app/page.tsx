@@ -33,17 +33,10 @@ import {
 
 export default function HomePage() {
   const router = useRouter();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // Removed local hero navigation; rely on global Topbar only
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Removed scroll styling logic for local hero nav
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -156,113 +149,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation Header */}
-      <nav
-        className={`fixed w-full z-50 transition-all duration-300 ${
-          isScrolled ? 'bg-white/95 backdrop-blur-md shadow-lg py-4' : 'bg-transparent py-6'
-        }`}
-        aria-label="Main Navigation"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <div className="relative" aria-hidden="true">
-                <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full blur-lg opacity-70 animate-pulse"></div>
-                <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full p-2">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                kenbright 360°
-              </span>
-            </div>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link
-                href="#benefits"
-                className={`transition-colors ${isScrolled ? 'text-gray-700 hover:text-indigo-600' : 'text-white hover:text-indigo-200'}`}
-              >
-                Benefits
-              </Link>
-              <Link
-                href="#products"
-                className={`transition-colors ${isScrolled ? 'text-gray-700 hover:text-indigo-600' : 'text-white hover:text-indigo-200'}`}
-              >
-                Products
-              </Link>
-              <Link
-                href="#tiers"
-                className={`transition-colors ${isScrolled ? 'text-gray-700 hover:text-indigo-600' : 'text-white hover:text-indigo-200'}`}
-              >
-                Tiers
-              </Link>
-              <button
-                onClick={() => router.push('/login')}
-                className="px-4 py-2 bg-white/20 backdrop-blur-md text-white border border-white/30 rounded-full hover:bg-white/30 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => router.push('/kyc')}
-                className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full hover:shadow-lg hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              >
-                Get Started
-              </button>
-            </div>
-
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden text-white focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              aria-label="Toggle navigation menu"
-              aria-controls="mobile-menu"
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-
-          {/* Mobile Navigation */}
-          {mobileMenuOpen && (
-            <div
-              id="mobile-menu"
-              className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl rounded-b-2xl p-6 space-y-4"
-            >
-              <Link
-                href="#benefits"
-                className="block text-gray-700 hover:text-indigo-600 font-medium"
-              >
-                Benefits
-              </Link>
-              <Link
-                href="#products"
-                className="block text-gray-700 hover:text-indigo-600 font-medium"
-              >
-                Products
-              </Link>
-              <Link href="#tiers" className="block text-gray-700 hover:text-indigo-600 font-medium">
-                Tiers
-              </Link>
-              <button
-                onClick={() => router.push('/login')}
-                className="w-full px-4 py-2 border border-indigo-600 text-indigo-600 rounded-full hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              >
-                Sign In
-              </button>
-              <button
-                onClick={() => router.push('/kyc')}
-                className="w-full px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-400"
-              >
-                Get Started
-              </button>
-            </div>
-          )}
-        </div>
-      </nav>
-
       {/* Hero Section with Custom SVG */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
+      <section className="relative mt-16 min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900">
         {/* Animated background elements */}
         <div className="absolute inset-0" aria-hidden="true">
           <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>

@@ -21,29 +21,41 @@ const optional: NavItem[] = [
 
 export default function Sidebar() {
   return (
-    <nav className="h-full p-4 space-y-6">
+    <nav className="h-full p-4 space-y-6 bg-white text-gray-700">
       <div>
-        <div className="px-2 pb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        <div className="px-2 pb-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
           Main
         </div>
         <ul className="px-2 space-y-1">
           <li>
-            <Link className="hover:underline" href="/">
+            <Link
+              className="block rounded-md px-2 py-1.5 hover:bg-gray-100 hover:text-indigo-600 transition-colors"
+              href="/"
+            >
               Dashboard
             </Link>
           </li>
           <li>
-            <Link className="hover:underline" href="/kyc">
+            <Link
+              className="block rounded-md px-2 py-1.5 hover:bg-gray-100 hover:text-indigo-600 transition-colors"
+              href="/kyc"
+            >
               KYC
             </Link>
           </li>
           <li>
-            <Link className="hover:underline" href="#">
+            <Link
+              className="block rounded-md px-2 py-1.5 hover:bg-gray-100 hover:text-indigo-600 transition-colors"
+              href="#"
+            >
               Loyalty
             </Link>
           </li>
           <li>
-            <Link className="hover:underline" href="#">
+            <Link
+              className="block rounded-md px-2 py-1.5 hover:bg-gray-100 hover:text-indigo-600 transition-colors"
+              href="#"
+            >
               Settings
             </Link>
           </li>
@@ -51,13 +63,16 @@ export default function Sidebar() {
       </div>
 
       <div>
-        <div className="px-2 pb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        <div className="px-2 pb-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
           Core
         </div>
         <ul className="px-2 space-y-1">
           {core.map((item) => (
             <li key={item.href}>
-              <Link className="hover:underline" href={item.href}>
+              <Link
+                className="block rounded-md px-2 py-1.5 hover:bg-gray-100 hover:text-indigo-600 transition-colors"
+                href={item.href}
+              >
                 {item.label}
               </Link>
             </li>
@@ -66,13 +81,16 @@ export default function Sidebar() {
       </div>
 
       <div>
-        <div className="px-2 pb-2 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        <div className="px-2 pb-2 text-xs font-medium text-gray-500 uppercase tracking-wide">
           Optional
         </div>
         <ul className="px-2 space-y-1">
           {optional.map((item) => (
             <li key={item.href}>
-              <Link className="hover:underline" href={item.href}>
+              <Link
+                className="block rounded-md px-2 py-1.5 hover:bg-gray-100 hover:text-indigo-600 transition-colors"
+                href={item.href}
+              >
                 {item.label}
               </Link>
             </li>

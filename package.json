@@ -51,9 +51,11 @@
     "typescript": "^5"
   },
   "lint-staged": {
-    "**/*.{ts,tsx,js,jsx,md,json,css}": [
-      "prettier --write",
+    "**/*.{ts,tsx,js,jsx}": [
       "eslint --fix --max-warnings=0"
+    ],
+    "**/*.{ts,tsx,js,jsx,md,json,css}": [
+      "prettier --write"
     ]
   }
 }

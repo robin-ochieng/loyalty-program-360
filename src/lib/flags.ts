@@ -1,1 +1,1 @@
-export const USE_SUPABASE = false; // flip to true when we reconnect the DB
+export const USE_SUPABASE = true; // set to false only for offline demo mode

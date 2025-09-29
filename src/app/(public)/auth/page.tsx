@@ -18,6 +18,7 @@ import {
   Globe,
   Loader2,
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 function AuthContent() {
   const searchParams = useSearchParams();
@@ -109,26 +110,36 @@ function AuthContent() {
     setLoading(true);
     setError(null);
     setSuccess(null);
+    const supabase = createClient();
     try {
-      await new Promise((r) => setTimeout(r, 800));
       if (isSignUp) {
-        setSuccess(
-          'Registration successful (mock). Please check your email to verify your account.',
-        );
-        setFormData({
-          email: '',
-          password: '',
-          confirmPassword: '',
-          fullName: '',
-          phoneNumber: '',
-          dateOfBirth: '',
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: { emailRedirectTo: undefined },
         });
-        setAgreedToTerms(false);
+        if (error) throw error;
+        setSuccess('Account created. You are now signed in.');
       } else {
-        setSuccess('Signed in successfully (mock). No session created.');
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+        if (error) throw error;
+        setSuccess('Signed in successfully.');
       }
-    } catch {
-      setError('An error occurred. Please try again.');
+      // redirect logic
+      const redirectTarget = searchParams?.get('redirect') || '/kyc';
+      // small delay so user sees success flash
+      setTimeout(() => {
+        window.location.href = redirectTarget;
+      }, 400);
+    } catch (err: unknown) {
+      if (typeof err === 'object' && err && 'message' in err) {
+        setError(String((err as { message?: unknown }).message) || 'Authentication failed.');
+      } else {
+        setError('Authentication failed.');
+      }
     } finally {
       setLoading(false);
     }

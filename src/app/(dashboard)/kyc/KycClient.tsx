@@ -244,63 +244,58 @@ export default function KycClient() {
     if (!validateStep3()) return;
     setLoading(true);
     try {
-      if (!USE_SUPABASE) {
-        // Mocked persistence: perform no network calls
-        // Simulate uploads to get mock paths
-        for (const [key, doc] of Object.entries(documents) as [DocumentKey, DocumentItem][]) {
-          if (doc.file) {
-            const p = await mockUpload(doc.file);
-            setDocuments((prev) => ({
-              ...prev,
-              [key]: { ...prev[key], url: p.path, isUploaded: true },
-            }));
-          }
-        }
-        alert('Saved locally (mock).');
-        router.push('/');
-        return;
+      let clientRecord: any = null;
+      if (USE_SUPABASE) {
+        const insertResp = await (supabase as any)
+          .from('clients')
+          .insert([
+            {
+              ...(clientData as ClientData),
+              kyc_completed: true,
+            } as any,
+          ])
+          .select()
+          .single();
+        if (insertResp.error) throw insertResp.error;
+        clientRecord = insertResp.data;
       }
 
-      const { data: clientRecord, error: clientError } = await (supabase as any)
-        .from('clients')
-        .insert([
-          {
-            ...(clientData as ClientData),
-            kyc_completed: true,
-          } as any,
-        ])
-        .select()
-        .single();
-      if (clientError) throw clientError;
-
-      for (const doc of Object.values(documents) as DocumentItem[]) {
-        if (doc.file) {
-          const filePath = await uploadDocumentToSupabase(
-            doc.file,
-            (clientRecord as any).id,
-            doc.type,
-          );
+      // Upload documents (real or mock)
+      for (const [key, doc] of Object.entries(documents) as [DocumentKey, DocumentItem][]) {
+        if (!doc.file) continue;
+        let path: string | undefined;
+        if (USE_SUPABASE) {
+          path = await uploadDocumentToSupabase(doc.file, clientRecord.id, doc.type);
           await (supabase as any).from('documents').insert([
             {
-              client_id: (clientRecord as any).id,
+              client_id: clientRecord.id,
               document_type: doc.type,
-              file_url: filePath,
+              file_url: path,
               file_name: doc.file.name,
               file_size: doc.file.size,
               mime_type: doc.file.type,
             } as any,
           ]);
+        } else {
+          const mockPath = await mockUpload(doc.file);
+          path = mockPath.path;
         }
+        setDocuments((prev) => ({
+          ...prev,
+          [key]: { ...prev[key], url: path, isUploaded: true },
+        }));
       }
 
-      const productRecords = selectedProducts.map((productId) => ({
-        client_id: (clientRecord as any).id,
-        product_id: productId,
-        status: 'Pending',
-      }));
-      await (supabase as any).from('client_products').insert(productRecords as any);
+      if (USE_SUPABASE) {
+        const productRecords = selectedProducts.map((productId) => ({
+          client_id: clientRecord.id,
+          product_id: productId,
+          status: 'Pending',
+        }));
+        await (supabase as any).from('client_products').insert(productRecords as any);
+      }
 
-      alert('KYC submission successful!');
+      alert(USE_SUPABASE ? 'KYC submission successful!' : 'Saved locally (mock).');
       router.push('/');
     } catch (error) {
       console.error('Error submitting KYC:', error);

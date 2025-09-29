@@ -113,12 +113,29 @@ function AuthContent() {
     const supabase = createClient();
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: { emailRedirectTo: undefined },
         });
         if (error) throw error;
+        // Create profile row (best-effort, non-blocking if fails)
+        try {
+          const userId = signUpData.user?.id;
+          if (userId) {
+            await supabase.from('profiles').insert([
+              {
+                id: userId,
+                full_name: formData.fullName,
+                phone_number: formData.phoneNumber,
+                date_of_birth: formData.dateOfBirth,
+              },
+            ]);
+          }
+        } catch (profileErr) {
+          // swallow profile creation errors; user still signed in
+          console.warn('Profile creation failed', profileErr);
+        }
         setSuccess('Account created. You are now signed in.');
       } else {
         const { error } = await supabase.auth.signInWithPassword({

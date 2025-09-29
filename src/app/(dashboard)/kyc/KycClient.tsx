@@ -246,11 +246,15 @@ export default function KycClient() {
     try {
       let clientRecord: any = null;
       if (USE_SUPABASE) {
+        // Fetch the authenticated user id to associate ownership
+        const { data: userData } = await (supabase as any).auth.getUser();
+        const authUserId = userData?.user?.id;
         const insertResp = await (supabase as any)
           .from('clients')
           .insert([
             {
               ...(clientData as ClientData),
+              user_id: authUserId,
               kyc_completed: true,
             } as any,
           ])
